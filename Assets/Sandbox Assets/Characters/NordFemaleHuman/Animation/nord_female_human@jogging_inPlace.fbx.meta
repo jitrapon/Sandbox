@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 30ca0404514e3480fa99f364a93d6254
-timeCreated: 1438060140
+guid: 67aa419afc18d894c92a043bbe376902
+timeCreated: 1438684879
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -137,7 +137,7 @@ ModelImporter:
     400126: mixamorig:Spine1
     400128: mixamorig:Spine2
     400130: //RootNode
-    7400000: walking_inPlace
+    7400000: jogging_inPlace
     9500000: //RootNode
   materials:
     importMaterials: 1
@@ -149,7 +149,7 @@ ModelImporter:
     optimizeGameObjects: 0
     motionNodeName: 
     animationImportErrors: 
-    animationImportWarnings: "MuscleClip 'nord_female_human@walking_inPlace' conversion
+    animationImportWarnings: "MuscleClip 'nord_female_human@jogging_inPlace' conversion
       warning: Bone length is different in avatar and animation\n\n     'mixamorig:LeftUpLeg'
       : position error = 89.526558 mm\n\n     'mixamorig:LeftLeg' : position error
       = 410.075256 mm\n\n     'mixamorig:LeftFoot' : position error = 403.012482 mm\n\n
@@ -157,7 +157,7 @@ ModelImporter:
       : position error = 89.453674 mm\n\n     'mixamorig:RightLeg' : position error
       = 410.068115 mm\n\n     'mixamorig:RightFoot' : position error = 403.006744
       mm\n\n     'mixamorig:RightToeBase' : position error = 141.098480 mm\n\nMuscleClip
-      'nord_female_human@walking_inPlace' conversion warning: 'mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2'
+      'nord_female_human@jogging_inPlace' conversion warning: 'mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2'
       is between humanoid transforms and has rotation animation. This might lower
       retargeting quality.\n\n"
     animationRetargetingWarnings: 
@@ -170,10 +170,10 @@ ModelImporter:
     extraExposedTransformPaths: []
     clipAnimations:
     - serializedVersion: 16
-      name: walking_inPlace
+      name: jogging_inPlace
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 38
+      lastFrame: 26
       wrapMode: 0
       orientationOffsetY: 0
       level: -.949999988
@@ -190,23 +190,7 @@ ModelImporter:
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves:
-      - name: WalkSpeed
-        curve:
-          serializedVersion: 2
-          curve:
-          - time: 0
-            value: 0
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-          - time: .26819855
-            value: .502501607
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-          preInfinity: 2
-          postInfinity: 2
+      curves: []
       events: []
       transformMask:
       - path: 

@@ -10,7 +10,8 @@ public class PlayerCharacter : MonoBehaviour {
 	[SerializeField] float m_JumpPower = 12f;
 	[Range(1f, 4f)][SerializeField] float m_GravityMultiplier = 2f;
 	[SerializeField] float m_RunCycleLegOffset = 0.2f; //specific to the character in sample assets, will need to be modified to work with others
-	[SerializeField] float m_MoveSpeedMultiplier = 1f;
+	[SerializeField] float m_WalkSpeedMultiplier = 1f;
+	[SerializeField] float m_RunSpeedMultiplier = 1f;
 	[SerializeField] float m_AnimSpeedMultiplier = 1f;
 	[SerializeField] float m_GroundCheckDistance = 0.1f;
 
@@ -117,51 +118,51 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 	
 	void ScaleCapsuleForCrouching(bool crouch) {
-//		if (m_IsGrounded && crouch)
-//		{
-//			if (m_Crouching) return;
-//			m_Capsule.height = m_Capsule.height / 2f;
-//			m_Capsule.center = m_Capsule.center / 2f;
-//			m_Crouching = true;
-//		}
-//		else
-//		{
-//			Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
-//			float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
-//			if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength))
-//			{
-//				m_Crouching = true;
-//				return;
-//			}
-//			m_Capsule.height = m_CapsuleHeight;
-//			m_Capsule.center = m_CapsuleCenter;
-//			m_Crouching = false;
-//		}
+		if (m_IsGrounded && crouch)
+		{
+			if (m_Crouching) return;
+			m_Capsule.height = m_Capsule.height / 2f;
+			m_Capsule.center = m_Capsule.center / 2f;
+			m_Crouching = true;
+		}
+		else
+		{
+			Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
+			float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
+			if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength))
+			{
+				m_Crouching = true;
+				return;
+			}
+			m_Capsule.height = m_CapsuleHeight;
+			m_Capsule.center = m_CapsuleCenter;
+			m_Crouching = false;
+		}
 	}
 	
 	void PreventStandingInLowHeadroom() {
-//		// prevent standing up in crouch-only zones
-//		if (!m_Crouching)
-//		{
-//			Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
-//			float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
-//			if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength))
-//			{
-//				m_Crouching = true;
-//			}
-//		}
+		// prevent standing up in crouch-only zones
+		if (!m_Crouching)
+		{
+			Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
+			float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
+			if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength))
+			{
+				m_Crouching = true;
+			}
+		}
 	}
 
 	void UpdateAnimator(Vector3 move) {
 		// update the animator parameters
 		// limit maximum walking speed or running speed by controlling the forward amount
 		if (!Input.GetKey(KeyCode.LeftShift)) {
-			m_ForwardAmount = Mathf.Min(0.5f, m_ForwardAmount);
+			m_ForwardAmount = Mathf.Min(0.75f, m_ForwardAmount);
 		}
 
 		m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
 		m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
-//		m_Animator.SetBool("Crouch", m_Crouching);
+		m_Animator.SetBool("Crouch", m_Crouching);
 		m_Animator.SetBool("OnGround", m_IsGrounded);
 		if (!m_IsGrounded) {
 			m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
@@ -201,11 +202,11 @@ public class PlayerCharacter : MonoBehaviour {
 	}
 	
 	void HandleAirborneMovement() {
-//		// apply extra gravity from multiplier:
-//		Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
-//		m_Rigidbody.AddForce(extraGravityForce);
-//		
-//		m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
+		// apply extra gravity from multiplier:
+		Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
+		m_Rigidbody.AddForce(extraGravityForce);
+
+		m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
 	}
 	
 	
@@ -233,12 +234,19 @@ public class PlayerCharacter : MonoBehaviour {
 	// this allows us to modify the positional speed before it's applied.
 	public void OnAnimatorMove() {
 		if (m_IsGrounded && Time.deltaTime > 0) {
-//			Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
-			Vector3 v = (m_moveDir * m_MoveSpeedMultiplier * m_ForwardAmount) / Time.deltaTime;
+//			Vector3 v = (m_Animator.deltaPosition * m_WalkSpeedMultiplier) / Time.deltaTime;
+			Vector3 v;
+			if (m_isRunning) {
+				v = m_moveDir * m_RunSpeedMultiplier * m_ForwardAmount;
+			}
+			else {
+				v = m_moveDir * m_WalkSpeedMultiplier * m_ForwardAmount;
+			}
 
 			// we preserve the existing y part of the current velocity.
 			v.y = m_Rigidbody.velocity.y;
 			m_Rigidbody.velocity = v;
+			Debug.Log ("Velocity: " + v);
 		}
 	}
 
