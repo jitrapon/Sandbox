@@ -31,6 +31,9 @@ public class PlayerCharacter : MonoBehaviour {
 	float m_CapsuleHeight;
 	Vector3 m_CapsuleCenter;
 	CapsuleCollider m_Capsule;
+	private float heavyBreathingStamina = 9f;
+	private float mediumBreathingStamina = 14f;
+	private float slowBreathingStamina = 22f;
 
 	// player states
 	bool m_IsGrounded;
@@ -44,10 +47,12 @@ public class PlayerCharacter : MonoBehaviour {
 	bool groundAlerted = false;
 
 	// audio
-	private AudioSource audioSource;
+	private AudioSource audioSourceFoot;		// audio source responsible for footsteps from walking, running, jumping, etc.
+	private AudioSource audioSourceVoice;		// audio source responsible for uttering voices, breathing, and speaking
 	public AudioClip[] floorStep;
-	private float volLowRange = .5f;
-	private float volHighRange = 1.0f;
+	public AudioClip[] heavyBreathing;
+	public AudioClip[] mediumBreathing;
+	public AudioClip[] slowBreathing;
 
 	Vector3 m_moveDir;
 	Vector3 m_normMoveDir;
@@ -65,7 +70,9 @@ public class PlayerCharacter : MonoBehaviour {
 		m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
 		m_OrigGroundCheckDistance = m_GroundCheckDistance;
 
-		audioSource = GetComponent<AudioSource> ();
+		AudioSource[] audioSources = GetComponents<AudioSource> ();
+		audioSourceFoot = audioSources[0];
+		audioSourceVoice = audioSources [1];
 
 		stamina = m_Stamina;
 
@@ -106,15 +113,33 @@ public class PlayerCharacter : MonoBehaviour {
 	// animation event callback on animation event for footstep sound effect
 	// @param -1 for left leg, and 1 for right leg
 	public void PlayFootStepSound(int leg) {
-//		if (m_isWalking && !audioSource.isPlaying) {
-//			audioSource.clip = floorStep[0];
-//			audioSource.Play();
-//		}
-//		else if (!m_isWalking && audioSource.isPlaying) {
-//			audioSource.Pause ();
-//		}
-		audioSource.clip = floorStep [0];
-		audioSource.Play ();
+		if (!audioSourceFoot.isPlaying) {
+			audioSourceFoot.clip = floorStep [Random.Range (0, floorStep.Length)];
+			audioSourceFoot.Play ();
+		}
+	}
+
+	public void PlayVoiceSound() {
+		if (m_IsGrounded) {
+			if (stamina < heavyBreathingStamina) {
+				if (!audioSourceVoice.isPlaying) {
+					audioSourceVoice.clip = heavyBreathing[Random.Range (0, heavyBreathing.Length)];
+					audioSourceVoice.Play ();
+				}
+			}
+			else if (stamina >= heavyBreathingStamina && stamina < mediumBreathingStamina) {
+				if (!audioSourceVoice.isPlaying) {
+					audioSourceVoice.clip = mediumBreathing[Random.Range (0, mediumBreathing.Length)];
+					audioSourceVoice.Play ();
+				}
+			}
+			else if (stamina >= mediumBreathingStamina && stamina < slowBreathingStamina) {
+				if (!audioSourceVoice.isPlaying) {
+					audioSourceVoice.clip = slowBreathing[Random.Range (0, slowBreathing.Length)];
+					audioSourceVoice.Play ();
+				}
+			}
+		}
 	}
 
 	/***** PLAYER CONTROLLER LOGIC *****/
@@ -169,6 +194,9 @@ public class PlayerCharacter : MonoBehaviour {
 
 		// update UI
 		UpdateHUD ();
+
+		// play sound effect
+		PlayVoiceSound ();
 	}
 
 	void SetStaminaText() {
